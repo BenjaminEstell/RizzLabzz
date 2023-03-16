@@ -7,9 +7,10 @@ from django.core.files.storage import FileSystemStorage
 import json
 import os
 import time
+import googlecloud
 
 # Create your views here.
-
+@csrf_exempt
 def machine(request):
 	if request.method == 'GET':
 		return getmachine(request)
@@ -30,7 +31,7 @@ def postmachine(request):
 	
 	if request.FILES.get("machine-gif"):
 		content = request.FILES['machine-gif']
-		filename = username + str(time.time()) + ".gif"
+		filename = str(time.time()) + ".gif"
 		fs = FileSystemStorage()
 		filename = fs.save(filename, content)
 		gifurl = fs.url(filename)
@@ -39,7 +40,7 @@ def postmachine(request):
 	
 	if request.FILES.get("muscle-image"):
 		content = request.FILES['muscle-image']
-		filename = username + str(time.time()) + ".jpeg"
+		filename = str(time.time()) + ".jpeg"
 		fs = FileSystemStorage()
 		filename = fs.save(filename, content)
 		imageurl = fs.url(filename)
@@ -47,11 +48,55 @@ def postmachine(request):
 		imageurl = None
 
 	cursor = connection.cursor()
-	cursor.execute('INSERT INTO %s (name, instructions, machineurl, muscles, muscleurl) VALUES '
-		'(%s, %s, %s, %s, %s);', (table, name, instructions, gifurl, muscles, imageurl))
-	return JsonResponse(status=200)
+	if table == "titanfitness":
+		cursor.execute('INSERT INTO titanfitness (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
+	elif table == "cybex":
+                cursor.execute('INSERT INTO cybex (name, instructions, machineurl, muscles, muscleurl) VALUES '
+                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+                return HttpResponse(status=200)
+	elif table == "lifefitness":
+                cursor.execute('INSERT INTO lifefitness (name, instructions, machineurl, muscles, muscleurl) VALUES '
+                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+                return HttpResponse(status=200)
+	elif table == "matrix":
+                cursor.execute('INSERT INTO matrix (name, instructions, machineurl, muscles, muscleurl) VALUES '
+                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+                return HttpResponse(status=200)
+	elif table == "hammerstrength":
+                cursor.execute('INSERT INTO hammerstrength (name, instructions, machineurl, muscles, muscleurl) VALUES '
+                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+                return HttpResponse(status=200)
+	elif table == "generic":
+                cursor.execute('INSERT INTO generic (name, instructions, machineurl, muscles, muscleurl) VALUES '
+                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+                return HttpResponse(status=200)
+	else:
+		return HttpResponse(status=400)
 
 def related(request):
 	if request.method != 'GET':
 		return HttpResponse(status=404)
 	return HttpResponse(status=400)
+
+def getmachine(request):
+	if request.method!= 'GET':
+		return HttpResponse(status=404)
+
+	if request.FILES.get['image']:
+		image = request.FILES.['image']
+		# Call googlecloud recognize image with image
+		# Returns best machine image label and bounding box
+		label, boundingbox = googlecloud.analyze(image)
+		cursor = connection.cursor()
+		cursor.execute('SELECT name, instructions, machineurl FROM generic WHERE name = %s', label)
+		data = cursor.fetchone()
+		response = {}
+		response['machine-type'] = data['name']
+		response['machine-bounding-box'] = boundingbox
+		response['machine-usage-instructions'] = data['instructions']
+		response['machine-usage-photo'] = data['machineurl']
+		return JsonResponse(response)
+	else:
+		return HttpResponse(status=400)
