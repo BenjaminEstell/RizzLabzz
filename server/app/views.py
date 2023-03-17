@@ -53,25 +53,25 @@ def postmachine(request):
 		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
 		return HttpResponse(status=200)
 	elif table == "cybex":
-                cursor.execute('INSERT INTO cybex (name, instructions, machineurl, muscles, muscleurl) VALUES '
-                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
-                return HttpResponse(status=200)
+		cursor.execute('INSERT INTO cybex (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
 	elif table == "lifefitness":
-                cursor.execute('INSERT INTO lifefitness (name, instructions, machineurl, muscles, muscleurl) VALUES '
-                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
-                return HttpResponse(status=200)
+		cursor.execute('INSERT INTO lifefitness (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
 	elif table == "matrix":
-                cursor.execute('INSERT INTO matrix (name, instructions, machineurl, muscles, muscleurl) VALUES '
-                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
-                return HttpResponse(status=200)
+		cursor.execute('INSERT INTO matrix (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
 	elif table == "hammerstrength":
-                cursor.execute('INSERT INTO hammerstrength (name, instructions, machineurl, muscles, muscleurl) VALUES '
-                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
-                return HttpResponse(status=200)
+		cursor.execute('INSERT INTO hammerstrength (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
 	elif table == "generic":
-                cursor.execute('INSERT INTO generic (name, instructions, machineurl, muscles, muscleurl) VALUES '
-                '(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
-                return HttpResponse(status=200)
+		cursor.execute('INSERT INTO generic (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
 	else:
 		return HttpResponse(status=400)
 
