@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 import json
 import os
 import time
-import googlecloud
+import analyze
 
 # Create your views here.
 @csrf_exempt
@@ -81,20 +81,22 @@ def related(request):
 	return HttpResponse(status=400)
 
 def getmachine(request):
-	if request.method!= 'GET':
+	if request.method != 'GET':
 		return HttpResponse(status=404)
 
 	if request.FILES.get['image']:
 		image = request.FILES.['image']
 		# Call googlecloud recognize image with image
 		# Returns best machine image label and bounding box
-		label, boundingbox = googlecloud.analyze(image)
+		label, annotated = analyze.analyze(image)
+		if label == "none":
+			return HttpResponse(status=505)
 		cursor = connection.cursor()
 		cursor.execute('SELECT name, instructions, machineurl FROM generic WHERE name = %s', label)
 		data = cursor.fetchone()
 		response = {}
 		response['machine-type'] = data['name']
-		response['machine-bounding-box'] = boundingbox
+		response['annotated-image'] = annotated
 		response['machine-usage-instructions'] = data['instructions']
 		response['machine-usage-photo'] = data['machineurl']
 		return JsonResponse(response)
