@@ -7,18 +7,8 @@ from django.core.files.storage import FileSystemStorage
 import json
 import os
 import time
-import analyze
 
 # Create your views here.
-@csrf_exempt
-def machine(request):
-	if request.method == 'GET':
-		return getmachine(request)
-	elif request.method == 'POST':
-		return postmachine(request)
-	else:
-		return HttpResponse(status=404)
-
 @csrf_exempt
 def postmachine(request):
 	if request.method != 'POST':
@@ -80,25 +70,14 @@ def related(request):
 		return HttpResponse(status=404)
 	return HttpResponse(status=400)
 
-def getmachine(request):
+def getmachine(request, label):
 	if request.method != 'GET':
 		return HttpResponse(status=404)
-
-	if request.FILES.get['image']:
-		image = request.FILES.['image']
-		# Call googlecloud recognize image with image
-		# Returns best machine image label and bounding box
-		label, annotated = analyze.analyze(image)
-		if label == "none":
-			return HttpResponse(status=505)
-		cursor = connection.cursor()
-		cursor.execute('SELECT name, instructions, machineurl FROM generic WHERE name = %s', label)
-		data = cursor.fetchone()
-		response = {}
-		response['machine-type'] = data['name']
-		response['annotated-image'] = annotated
-		response['machine-usage-instructions'] = data['instructions']
-		response['machine-usage-photo'] = data['machineurl']
-		return JsonResponse(response)
-	else:
-		return HttpResponse(status=400)
+	if label == "none" or label == "":
+		return HttpResponse(status=505)
+	cursor = connection.cursor()
+	cursor.execute('SELECT name, instructions, machineurl FROM generic WHERE name = %s', (label,))
+	data = cursor.fetchone()
+	response = {}
+	response['machine-info'] = data
+	return JsonResponse(response)
