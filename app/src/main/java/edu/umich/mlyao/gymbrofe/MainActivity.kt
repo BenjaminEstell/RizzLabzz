@@ -2,6 +2,7 @@ package edu.umich.mlyao.gymbrofe
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -49,6 +50,11 @@ class MainActivity : AppCompatActivity() {
 
         // Set up the listeners for take photo and pick image buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+
+        viewBinding.gymbroHomeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         // Registers a photo picker activity launcher in single-select mode.
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->

@@ -52,3 +52,7 @@ dependencies {
 
     implementation "androidx.activity:activity:1.6.1"
 }
+
+task prepareKotlinBuildScriptModel {
+
+}
