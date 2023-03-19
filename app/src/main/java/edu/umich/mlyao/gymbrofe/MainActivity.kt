@@ -2,6 +2,7 @@ package edu.umich.mlyao.gymbrofe
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -18,6 +19,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import edu.umich.mlyao.gymbrofe.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -64,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("PhotoPicker", "Selected URI: $uri")
 
                 // Analyze photo
-                analyze(uri)
+                MainScope().async{analyze(uri)}
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -114,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, msg)
 
                     // Analyze photo
-                    output.savedUri?.let { analyze(it) }
+                    MainScope().async{output.savedUri?.let { analyze(it) }}
                 }
             }
         )
@@ -190,7 +195,7 @@ class MainActivity : AppCompatActivity() {
             ).apply {}.toTypedArray()
     }
 
-    private fun analyze(imageUri: Uri) {
+    private suspend fun analyze(imageUri: Uri): String {
         // Get Image Path
         val filePath = getRealPathFromURI(imageUri)
         val file = filePath?.let { File(it) }
@@ -228,10 +233,13 @@ class MainActivity : AppCompatActivity() {
         connection.doOutput = true
 
         // Send request
-        val wr = DataOutputStream(
-            connection.outputStream)
-        wr.writeBytes(encodedFile)
-        wr.close()
+        withContext(Dispatchers.Default) {
+            val wr = DataOutputStream(
+                connection.outputStream)
+            wr.writeBytes(encodedFile)
+            wr.close()
+        }
+
 
         // Get Response
         val stream = connection.inputStream
@@ -265,6 +273,8 @@ class MainActivity : AppCompatActivity() {
 
         //return label when used
         println(label)
+        Toast.makeText(baseContext, label, Toast.LENGTH_SHORT).show()
+        return label
     }
 
     private fun getRealPathFromURI(uri: Uri): String? {
