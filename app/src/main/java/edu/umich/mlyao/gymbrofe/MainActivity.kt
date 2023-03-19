@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -191,7 +192,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun analyze(imageUri: Uri) {
         // Get Image Path
-        val filePath = imageUri.path
+        val filePath = getRealPathFromURI(imageUri)
         val file = filePath?.let { File(it) }
 
         // Base 64 Encode
@@ -263,5 +264,14 @@ class MainActivity : AppCompatActivity() {
 
         //return label when used
         println(label)
+    }
+
+    private fun getRealPathFromURI(uri: Uri): String? {
+        val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
+        cursor?.moveToFirst()
+        val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+        val realPath = idx?.let { cursor.getString(it) }
+        cursor?.close()
+        return realPath
     }
 }
