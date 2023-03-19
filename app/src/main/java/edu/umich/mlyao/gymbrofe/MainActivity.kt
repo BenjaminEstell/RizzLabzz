@@ -205,8 +205,9 @@ class MainActivity : AppCompatActivity() {
         val modelEndpoint = "gymbro/2" // Set model endpoint (Found in Dataset URL)
 
         // Construct the URL
+        val jpgName = filePath?.split("/")?.last()
         val uploadURL =
-            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=chestpress2.JPG"
+            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName"
 
         val label: String?
 
@@ -226,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         connection.useCaches = false
         connection.doOutput = true
 
-        //Send request
+        // Send request
         val wr = DataOutputStream(
             connection.outputStream)
         wr.writeBytes(encodedFile)
