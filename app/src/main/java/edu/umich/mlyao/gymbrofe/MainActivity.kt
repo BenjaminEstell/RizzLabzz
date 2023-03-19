@@ -5,7 +5,6 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("PhotoPicker", "Selected URI: $uri")
 
                 // Analyze photo
-                // analyze(uri)
+                analyze(uri)
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -87,9 +86,7 @@ class MainActivity : AppCompatActivity() {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/GymBro-Image")
-            }
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/GymBro-Image")
         }
 
         // Create output options object which contains file + metadata
@@ -116,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, msg)
 
                     // Analyze photo
-                    // output.savedUri?.let { analyze(it) }
+                    output.savedUri?.let { analyze(it) }
                 }
             }
         )
@@ -189,35 +186,31 @@ class MainActivity : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
                 Manifest.permission.CAMERA
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
+            ).apply {}.toTypedArray()
     }
 
     private fun analyze(imageUri: Uri) {
         // Get Image Path
-        val filePath = System.getProperty("user.dir") + System.getProperty("file.separator") + "app/src/main/java/edu/umich/anasharm/gymbrotest/chestpress2.JPG"
-        //val filePath = "/Users/erican/Desktop/Rizz/app/src/main/java/edu/umich/anasharm/gymbrotest/chestpress2.JPG"
-        val file = File(filePath)
+        val filePath = imageUri.path
+        val file = filePath?.let { File(it) }
 
         // Base 64 Encode
         val encodedFile: String
         val fileInputStreamReader = FileInputStream(file)
-        val bytes = ByteArray(file.length().toInt())
+        val bytes = file?.length()?.let { ByteArray(it.toInt()) }
         fileInputStreamReader.read(bytes)
         encodedFile = String(Base64.getEncoder().encode(bytes), StandardCharsets.US_ASCII)
-        val API_KEY = "q6YVWAZVYbczbL2e1K4n" // Your API Key
-        val MODEL_ENDPOINT = "gymbro/2" // Set model endpoint (Found in Dataset URL)
+        val apiKey = "q6YVWAZVYbczbL2e1K4n" // Your API Key
+        val modelEndpoint = "gymbro/2" // Set model endpoint (Found in Dataset URL)
 
         // Construct the URL
-        val uploadURL ="https://detect.roboflow.com/" + MODEL_ENDPOINT + "?api_key=" + API_KEY + "&name=chestpress2.JPG";
+        val uploadURL =
+            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=chestpress2.JPG"
 
-        var label: String?
+        val label: String?
 
         // Http Request
-        var connection: HttpURLConnection? = null
+        val connection: HttpURLConnection?
 
         // Configure connection to URL
         val url = URL(uploadURL)
@@ -226,7 +219,8 @@ class MainActivity : AppCompatActivity() {
         connection.setRequestProperty("Content-Type",
             "application/x-www-form-urlencoded")
         connection.setRequestProperty("Content-Length",
-            Integer.toString(encodedFile.toByteArray().size))
+            encodedFile.toByteArray().size.toString()
+        )
         connection.setRequestProperty("Content-Language", "en-US")
         connection.useCaches = false
         connection.doOutput = true
@@ -251,21 +245,21 @@ class MainActivity : AppCompatActivity() {
         }
         reader.close()
 
-        var delimiter1 = "{\"time\":"
-        var delimiter2 = ",\"image\":{\"width\":"
-        var delimiter3 = ",\"height\":"
-        var delimiter4 = "},\"predictions\":[{\"x\":"
-        var delimiter5 = ",\"y\":"
-        var delimiter6 = ",\"width\":"
-        var delimiter7 = ",\"confidence\":"
-        var delimiter8 = ",\"class\":\""
-        var delimiter9 = "\"}]}"
+        val delimiter1 = "{\"time\":"
+        val delimiter2 = ",\"image\":{\"width\":"
+        val delimiter3 = ",\"height\":"
+        val delimiter4 = "},\"predictions\":[{\"x\":"
+        val delimiter5 = ",\"y\":"
+        val delimiter6 = ",\"width\":"
+        val delimiter7 = ",\"confidence\":"
+        val delimiter8 = ",\"class\":\""
+        val delimiter9 = "\"}]}"
         println(firstline)
         val parts = firstline.split(delimiter1,delimiter2,delimiter3,delimiter4,delimiter5,delimiter6,delimiter7,delimiter8,delimiter9)
         println(parts)
         label = parts[9]
 
-        connection?.disconnect()
+        connection.disconnect()
 
         //return label when used
         println(label)
