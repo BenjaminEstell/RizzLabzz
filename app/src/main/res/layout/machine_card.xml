@@ -60,7 +60,18 @@
             android:text="@string/close_button"
             android:textSize="24sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="returnToHomeScreen" />
+
+        <TextView
+            android:id="@+id/machineName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/machine_name"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:translationX="18sp"
+            android:translationY="95sp" />
 
     </androidx.cardview.widget.CardView>
 
