@@ -58,16 +58,6 @@ class MainActivity : AppCompatActivity() {
         // Set up the listeners for take photo and pick image buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
 
-        viewBinding.gymbroHomeButton.setOnClickListener {
-            //val intent = Intent(this, MainActivity::class.java)
-            //startActivity(intent)
-
-            val card = BottomSheetDialog(this)
-            val view = layoutInflater.inflate(R.layout.machine_card, null)
-            card.setContentView(view)
-            card.show()
-        }
-
         // Registers a photo picker activity launcher in single-select mode.
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             // Callback is invoked after the user selects a media item or closes the
@@ -130,6 +120,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+        // Toast popup
+        Thread.sleep(5000)
+        Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
+        Thread.sleep(5000)
+        val card = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.machine_card, null)
+        card.setContentView(view)
+        card.show()
     }
 
     fun returnToHomeScreen(view: View) {
