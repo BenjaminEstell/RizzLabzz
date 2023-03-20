@@ -19,7 +19,6 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('machine/', views.postmachine, name='postmachine'),
-    path('machine/<label>/', views.getmachine, name='machine'),
+    path('machine/', views.machine, name='machine'),
     path('related/', views.related, name='related'),
 ]
