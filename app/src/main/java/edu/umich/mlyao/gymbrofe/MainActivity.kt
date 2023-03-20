@@ -247,17 +247,19 @@ class MainActivity : AppCompatActivity() {
         connection.useCaches = false
         connection.doOutput = true
 
+        val stream: InputStream
         // Send request
         withContext(Dispatchers.Default) {
             val wr = DataOutputStream(
                 connection.outputStream)
             wr.writeBytes(encodedFile)
             wr.close()
+            // Get Response
+            stream = connection.inputStream
         }
 
 
-        // Get Response
-        val stream = connection.inputStream
+
         val reader = BufferedReader(InputStreamReader(stream))
         var line: String?
         var firstline = "test"

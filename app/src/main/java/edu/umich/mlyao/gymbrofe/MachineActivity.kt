@@ -25,7 +25,7 @@ object MachineActivity {
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("getChatts", "Failed GET request")
+                Log.e("getMachine", "Failed GET request")
             }
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
