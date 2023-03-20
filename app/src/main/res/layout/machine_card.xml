@@ -59,19 +59,35 @@
             android:background="@null"
             android:text="@string/close_button"
             android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             android:onClick="returnToHomeScreen" />
 
         <TextView
-            android:id="@+id/machineName"
+            android:id="@+id/machine_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:text="@string/machine_name"
+            android:textColor="#000000"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:translationX="18sp"
             android:translationY="95sp" />
+
+        <TextView
+            android:id="@+id/machine_instructions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/machine_instructions"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:translationY="150sp" />
+
+        <ImageView
+            android:id="@+id/machine_usage_image"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:translationY="395sp"
+            app:srcCompat="@drawable/lying_leg_curl" />
 
     </androidx.cardview.widget.CardView>
 
