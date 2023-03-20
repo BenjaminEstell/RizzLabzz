@@ -9,15 +9,6 @@ import os
 import time
 
 # Create your views here.
-
-def machine(request):
-	if request.method == 'GET':
-		return getmachine(request)
-	elif request.method == 'POST':
-		return postmachine(request)
-	else:
-		return HttpResponse(status=404)
-
 @csrf_exempt
 def postmachine(request):
 	if request.method != 'POST':
@@ -30,7 +21,7 @@ def postmachine(request):
 	
 	if request.FILES.get("machine-gif"):
 		content = request.FILES['machine-gif']
-		filename = username + str(time.time()) + ".gif"
+		filename = str(time.time()) + ".gif"
 		fs = FileSystemStorage()
 		filename = fs.save(filename, content)
 		gifurl = fs.url(filename)
@@ -39,7 +30,7 @@ def postmachine(request):
 	
 	if request.FILES.get("muscle-image"):
 		content = request.FILES['muscle-image']
-		filename = username + str(time.time()) + ".jpeg"
+		filename = str(time.time()) + ".jpeg"
 		fs = FileSystemStorage()
 		filename = fs.save(filename, content)
 		imageurl = fs.url(filename)
@@ -47,11 +38,46 @@ def postmachine(request):
 		imageurl = None
 
 	cursor = connection.cursor()
-	cursor.execute('INSERT INTO %s (name, instructions, machineurl, muscles, muscleurl) VALUES '
-		'(%s, %s, %s, %s, %s);', (table, name, instructions, gifurl, muscles, imageurl))
-	return JsonResponse(status=200)
+	if table == "titanfitness":
+		cursor.execute('INSERT INTO titanfitness (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
+	elif table == "cybex":
+		cursor.execute('INSERT INTO cybex (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
+	elif table == "lifefitness":
+		cursor.execute('INSERT INTO lifefitness (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
+	elif table == "matrix":
+		cursor.execute('INSERT INTO matrix (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
+	elif table == "hammerstrength":
+		cursor.execute('INSERT INTO hammerstrength (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
+	elif table == "generic":
+		cursor.execute('INSERT INTO generic (name, instructions, machineurl, muscles, muscleurl) VALUES '
+		'(%s, %s, %s, %s, %s);', (name, instructions, gifurl, muscles, imageurl))
+		return HttpResponse(status=200)
+	else:
+		return HttpResponse(status=400)
 
 def related(request):
 	if request.method != 'GET':
 		return HttpResponse(status=404)
 	return HttpResponse(status=400)
+
+def getmachine(request, label):
+	if request.method != 'GET':
+		return HttpResponse(status=404)
+	if label == "none" or label == "":
+		return HttpResponse(status=505)
+	cursor = connection.cursor()
+	cursor.execute('SELECT name, instructions, machineurl FROM generic WHERE name = %s', (label,))
+	data = cursor.fetchone()
+	response = {}
+	response['machine-info'] = data
+	return JsonResponse(response)
