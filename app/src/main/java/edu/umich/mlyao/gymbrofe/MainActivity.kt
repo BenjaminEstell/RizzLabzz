@@ -21,10 +21,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.umich.mlyao.gymbrofe.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -33,6 +29,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import edu.umich.mlyao.gymbrofe.MachineActivity.getMachine
+import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -41,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private var imageCapture: ImageCapture? = null
 
     private lateinit var cameraExecutor: ExecutorService
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +65,11 @@ class MainActivity : AppCompatActivity() {
                 Log.d("PhotoPicker", "Selected URI: $uri")
 
                 // Analyze photo
-                MainScope().async{analyze(uri)}
+                fun getMachineReq(view: View?) = startActivity(Intent(this, MachineActivity::class.java))
+                var label: String? = ""
+                MainScope().launch{label = analyze(uri)}
+                getMachine(label)
+
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -101,6 +104,7 @@ class MainActivity : AppCompatActivity() {
 
         // Set up image capture listener, which is triggered after photo has
         // been taken
+        fun getMachineReq(view: View?) = startActivity(Intent(this, MachineActivity::class.java))
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
@@ -109,14 +113,15 @@ class MainActivity : AppCompatActivity() {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
 
                     // Analyze photo
-                    MainScope().async{output.savedUri?.let { analyze(it) }}
+                    var label: String? = ""
+                    MainScope().launch{label = output.savedUri?.let { analyze(it) }}
+                    getMachine(label)
                 }
             }
         )
@@ -205,7 +210,7 @@ class MainActivity : AppCompatActivity() {
             ).apply {}.toTypedArray()
     }
 
-    private suspend fun analyze(imageUri: Uri): String {
+    private suspend fun analyze(imageUri: Uri): String? {
         // Get Image Path
         val filePath = getRealPathFromURI(imageUri)
         val file = filePath?.let { File(it) }
@@ -242,17 +247,19 @@ class MainActivity : AppCompatActivity() {
         connection.useCaches = false
         connection.doOutput = true
 
+        val stream: InputStream
         // Send request
         withContext(Dispatchers.Default) {
             val wr = DataOutputStream(
                 connection.outputStream)
             wr.writeBytes(encodedFile)
             wr.close()
+            // Get Response
+            stream = connection.inputStream
         }
 
 
-        // Get Response
-        val stream = connection.inputStream
+
         val reader = BufferedReader(InputStreamReader(stream))
         var line: String?
         var firstline = "test"
