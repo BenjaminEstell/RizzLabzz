@@ -70,8 +70,9 @@ def related(request):
                 return HttpResponse(status=404)
         return HttpResponse(status=400)
 
+@csrf_exempt
 def getmachine(request, label):
-        if request.method != 'GET' or request.method != 'POST':
+        if request.method != 'POST':
                 return HttpResponse(status=404)
         if label == "none" or label == "":
                 return HttpResponse(status=505)
@@ -82,9 +83,19 @@ def getmachine(request, label):
                 # get text back from text detection network
                 # send text to text filtering function
                 # get manufacturer back from function
-                manufacturer = "generic"
         cursor = connection.cursor()
-        cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM %s WHERE name = %s', (manufacturer, label))
+        if manufacturer == "titanfitness":
+       	        cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM titanfitness WHERE name=%s', (label,))
+        elif manufacturer == "cybex":
+                cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM cybex WHERE name=%s', (label,))
+        elif manufacturer == "lifefitness":
+                cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM lifefitness WHERE name=%s', (label,))
+        elif manufacturer == "matrix":
+                cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM matrix WHERE name=%s', (label,))
+        elif manufacturer == "hammerstrength":
+                cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM hammerstrength WHERE name=%s', (label,))
+        else:
+                cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM generic WHERE name=%s', (label,))
         data = cursor.fetchone()
         response = {}
         response['machine-info'] = data
