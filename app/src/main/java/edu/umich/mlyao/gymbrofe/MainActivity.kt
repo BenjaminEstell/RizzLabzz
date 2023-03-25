@@ -65,10 +65,11 @@ class MainActivity : AppCompatActivity() {
                 Log.d("PhotoPicker", "Selected URI: $uri")
 
                 // Analyze photo
-                fun getMachineReq(view: View?) = startActivity(Intent(this, MachineActivity::class.java))
-                var label: String? = ""
-                MainScope().launch{label = analyze(uri)}
-                getMachine(label)
+                startActivity(Intent(this, MachineActivity::class.java))
+                MainScope().launch {
+                    val label = analyze(uri)
+                    getMachine(label)
+                }
 
             } else {
                 Log.d("PhotoPicker", "No media selected")
@@ -104,7 +105,6 @@ class MainActivity : AppCompatActivity() {
 
         // Set up image capture listener, which is triggered after photo has
         // been taken
-        fun getMachineReq(view: View?) = startActivity(Intent(this, MachineActivity::class.java))
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
@@ -119,9 +119,10 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, msg)
 
                     // Analyze photo
-                    var label: String? = ""
-                    MainScope().launch{label = output.savedUri?.let { analyze(it) }}
-                    getMachine(label)
+                    MainScope().launch {
+                        val label = output.savedUri?.let { analyze(it) }
+                        getMachine(label)
+                    }
                 }
             }
         )
