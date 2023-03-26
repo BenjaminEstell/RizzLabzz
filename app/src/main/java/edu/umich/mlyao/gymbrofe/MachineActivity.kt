@@ -20,9 +20,11 @@ object MachineActivity {
 
 
     fun getMachine(label: String?) {
+        println("In get machine func")
         val request = Request.Builder()
             .url(serverUrl + "machine/" + label + "/")
             .build()
+        println(request)
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("getMachine", "Failed GET request")
@@ -31,10 +33,10 @@ object MachineActivity {
                 if (response.isSuccessful) {
                     val machineReceived = try { JSONObject(response.body?.string() ?: "")
                         .getJSONArray("machine-info") } catch (e: JSONException) { JSONArray() }
-                    val machine_data = machineReceived as JSONArray
-                    machine_name = machine_data[0].toString()
-                    machine_instructions = machine_data[1].toString()
-                    machine_url = machine_data[2].toString()
+                    val machineData = machineReceived as JSONArray
+                    machine_name = machineData[0].toString()
+                    machine_instructions = machineData[1].toString()
+                    machine_url = machineData[2].toString()
                 }
             }
         })

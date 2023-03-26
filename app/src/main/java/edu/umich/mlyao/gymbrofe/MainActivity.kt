@@ -34,6 +34,7 @@ import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var viewBinding: ActivityMainBinding
 
     private var imageCapture: ImageCapture? = null
@@ -66,9 +67,15 @@ class MainActivity : AppCompatActivity() {
 
                 // Analyze photo
                 startActivity(Intent(this, MachineActivity::class.java))
-                MainScope().launch {
-                    val label = analyze(uri)
-                    getMachine(label)
+
+
+                val scope = CoroutineScope(Dispatchers.Default)
+                scope.launch {
+                    val label = uri?.let { processImage(it) }
+                    println(label)
+                    if (label != null) {
+                        idMachine(label)
+                    }
                 }
 
             } else {
@@ -118,15 +125,21 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
 
+
                     // Analyze photo
-                    MainScope().launch {
-                        val label = output.savedUri?.let { analyze(it) }
-                        getMachine(label)
+                    val scope = CoroutineScope(Dispatchers.Default)
+                    scope.launch {
+                        val label = output.savedUri?.let { processImage(it) }
+                        println(label)
+                        if (label != null) {
+                            idMachine(label)
+                        }
                     }
                 }
             }
         )
         // Toast popup
+        //CHANGE THIS AFTER DEBUGGING
         Thread.sleep(5000)
         Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
         Thread.sleep(5000)
@@ -250,7 +263,7 @@ class MainActivity : AppCompatActivity() {
 
         val stream: InputStream
         // Send request
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             val wr = DataOutputStream(
                 connection.outputStream)
             wr.writeBytes(encodedFile)
@@ -285,15 +298,28 @@ class MainActivity : AppCompatActivity() {
         println(firstline)
         val parts = firstline.split(delimiter1,delimiter2,delimiter3,delimiter4,delimiter5,delimiter6,delimiter7,delimiter8,delimiter9)
         println(parts)
+
+        if(parts.size != 9){
+            Log.e("analyze response", "size of response was not 9")
+        }
         label = parts[9]
 
         connection.disconnect()
 
-        //return label when used
-        println(label)
-        Toast.makeText(baseContext, label, Toast.LENGTH_SHORT).show()
+//        Toast.makeText(baseContext, label, Toast.LENGTH_SHORT).show()
         return label
     }
+
+
+    private suspend fun idMachine(label: String) {
+        println("In id machine func")
+        return getMachine(label)
+    }
+    private suspend fun processImage(output_uri: Uri): String? {
+        println("In process image func")
+        return output_uri?.let { analyze(it) }
+    }
+
 
     private fun getRealPathFromURI(uri: Uri): String? {
         val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
