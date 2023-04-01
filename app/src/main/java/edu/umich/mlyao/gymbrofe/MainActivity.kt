@@ -243,7 +243,6 @@ class MainActivity : AppCompatActivity() {
         val uploadURL =
             "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName"
 
-        val label: String?
 
         // Http Request
         val connection: HttpURLConnection?
@@ -298,11 +297,15 @@ class MainActivity : AppCompatActivity() {
         println(firstline)
         val parts = firstline.split(delimiter1,delimiter2,delimiter3,delimiter4,delimiter5,delimiter6,delimiter7,delimiter8,delimiter9)
         println(parts)
+        val label:String?
 
-        if(parts.size != 9){
-            Log.e("analyze response", "size of response was not 9")
+        if (parts[9]!= null){
+            label = parts[9]
         }
-        label = parts[9]
+        else{
+            label = "No machine found"
+        }
+
 
         connection.disconnect()
 
