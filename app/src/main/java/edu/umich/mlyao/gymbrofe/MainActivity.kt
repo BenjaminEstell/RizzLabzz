@@ -241,7 +241,7 @@ class MainActivity : AppCompatActivity() {
         // Construct the URL
         val jpgName = filePath?.split("/")?.last()
         val uploadURL =
-            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName"
+            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName&confidence=1"
 
 
         // Http Request
@@ -275,16 +275,9 @@ class MainActivity : AppCompatActivity() {
 
         val reader = BufferedReader(InputStreamReader(stream))
         var line: String?
-        var firstline = "test"
-        var count = 0
-        while (reader.readLine().also { line = it } != null) {
-            if(count == 0){
-                firstline = (line).toString()
-                count = 1
-            }
-        }
-        reader.close()
-
+        var label = "test"
+        var parts = emptyList<String>()
+        var singleline = "test"
         val delimiter1 = "{\"time\":"
         val delimiter2 = ",\"image\":{\"width\":"
         val delimiter3 = ",\"height\":"
@@ -294,15 +287,29 @@ class MainActivity : AppCompatActivity() {
         val delimiter7 = ",\"confidence\":"
         val delimiter8 = ",\"class\":\""
         val delimiter9 = "\"}]}"
-        println(firstline)
-        val parts = firstline.split(delimiter1,delimiter2,delimiter3,delimiter4,delimiter5,delimiter6,delimiter7,delimiter8,delimiter9)
-        println(parts)
-        val label:String?
+        val delimiter10 = "\"},{\"x\":"
 
-        if (parts[9]!= null){
-            label = parts[9]
+        while (reader.readLine().also { line = it } != null) {
+            println(line)
+            singleline = line.toString()
+            parts = singleline.split(delimiter1,delimiter2,delimiter3,delimiter4,delimiter5,delimiter6,delimiter7,delimiter8,delimiter9,delimiter10)
+            println(parts)
         }
-        else{
+        reader.close()
+        //println(parts.size/6)
+        var largestBox = 0.0
+        for (i in 1..parts.size/6){
+            //println(parts[3+6+6*(i-1)])
+            var box = parts[3+3+6*(i-1)].toDouble()*parts[3+4+6*(i-1)].toDouble()
+            println(box)
+
+            if(box > largestBox){
+                largestBox = box
+                label = parts[3+6+6*(i-1)]
+            }
+        }
+
+        if (label == "test"){
             label = "No machine found"
         }
 
