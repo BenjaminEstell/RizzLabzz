@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 import json
 import os
 import time
-import ocr
+from app import ocr
 
 # Create your views here.
 @csrf_exempt
@@ -78,11 +78,11 @@ def getmachine(request, label):
         if label == "none" or label == "":
                 return HttpResponse(status=505)
         manufacturer = ""
-	texts = []
+        texts = []
         if request.FILES.get("image"):
-                image = request.FILES['image']
+                image = request.FILES['image'].read()
                 # send image to text detection network
-		texts = ocr.detect_text(image)
+                texts = ocr.detect_text(image)
                 # get text back from text detection network
                 # send text to text filtering function
                 # get manufacturer back from function
@@ -101,5 +101,6 @@ def getmachine(request, label):
                 cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM generic WHERE name=%s', (label,))
         data = cursor.fetchone()
         response = {}
-        response['machine-info'] = data
+        #response['machine-info'] = data
+        response = texts
         return JsonResponse(response)

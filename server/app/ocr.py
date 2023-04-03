@@ -4,7 +4,8 @@ import io
 
 def detect_text(content):
     client = vision.ImageAnnotatorClient()
-
+    image_buffer = io.BytesIO(content)
+    image_bytes = image_buffer.read()
     image = vision.Image(content=content)
 
     response = client.text_detection(image=image)
