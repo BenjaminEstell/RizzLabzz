@@ -62,7 +62,7 @@
             android:onClick="returnToHomeScreen" />
 
         <TextView
-            android:id="@+id/machine_name"
+            android:id="@+id/machineName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
