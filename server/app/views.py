@@ -89,6 +89,18 @@ def getmachine(request, label):
                 # texts_resp is a list of strings found in the image
                 # determine manufacturer from this list of strings
                 # get manufacturer back from function
+                brand_list = ["titan", "cybex", "life", "hammer", "matrix", "titanfitness", "lifefitness", "hammerstrength"]
+                brands = set(brand_list)
+                for word in texts_resp.lower():
+                        if word in brands:
+                                manufacturer = word
+                                break
+                if manufacturer == "life":
+                        manufacturer = "lifefitness"
+                elif manufacturer == "titan":
+                        manufacturer = "titanfitness"
+                elif manufacturer == "hammer":
+                        manufacturer = "hammerstrength"
         cursor = connection.cursor()
         if manufacturer == "titanfitness":
        	        cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM titanfitness WHERE name=%s', (label,))
