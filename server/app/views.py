@@ -85,13 +85,13 @@ def getmachine(request, label):
                 # send image to text detection network
                 texts = ocr.detect_text(image)
                 for text in texts:
-                        texts_resp.append(text.description)
+                        texts_resp.append(text.description.lower())
                 # texts_resp is a list of strings found in the image
                 # determine manufacturer from this list of strings
                 # get manufacturer back from function
                 brand_list = ["titan", "cybex", "scybex", "life", "hammer", "matrix", "titanfitness", "lifefitness", "hammerstrength"]
                 brands = set(brand_list)
-                for word in texts_resp.lower():
+                for word in texts_resp:
                         if word in brands:
                                 manufacturer = word
                                 break
