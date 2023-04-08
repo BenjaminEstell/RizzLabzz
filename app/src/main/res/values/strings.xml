@@ -5,4 +5,5 @@
     <string name="close_button">X</string>
     <string name="machine_name">Lying Down Leg Curl</string>
     <string name="machine_instructions">The lying leg curl is a great exercise to isolate the hamstrings. Set up for the leg curl by selecting the weight you want to use on the stack and adjusting the padding to be positioned just above the back of your ankles. Lay face down on the machine. Contract the hamstrings by taking the weight slightly off the stack. This is the starting position for the exercise. Driving your upper legs into the padding, squeeze the hamstrings and curl the weight up as far as possible. Lower the weight back to the starting position, and do so slowly to avoid injury. Repeat for desired reps.</string>
+    <string name="adaptation_info">The above information was adapted from muscleandstrength.com and fitnessprogrammer.com.</string>
 </resources>
