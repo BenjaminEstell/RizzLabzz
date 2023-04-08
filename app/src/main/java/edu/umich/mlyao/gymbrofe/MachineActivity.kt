@@ -41,6 +41,9 @@ object MachineActivity {
                     machine_instructions = machineData[1].toString()
                     machine_url = machineData[2].toString()
                     machine = Machine(machine_name, machine_instructions, machine_url)
+                    Log.d("Machine Name 1", machine.name.toString())
+                    Log.d("Machine Instructions 1", machine.instructions.toString())
+                    Log.d("Machine URL 1", machine.gifUrl.toString())
                 }
             }
         })
