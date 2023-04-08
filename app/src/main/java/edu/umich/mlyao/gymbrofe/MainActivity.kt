@@ -145,6 +145,16 @@ class MainActivity : AppCompatActivity() {
                         if (label != null) {
                             machine = idMachine(label)
                         }
+
+                        if (machine.name != null) {
+                            Log.d("Machine Name", machine.name.toString())
+                        }
+                        if (machine.instructions != null) {
+                            Log.d("Machine Name", machine.instructions.toString())
+                        }
+                        if (machine.gifUrl != null) {
+                            Log.d("Machine Name", machine.gifUrl.toString())
+                        }
                         val view = populateCard(machine)
                         runOnUiThread {
                             if (view != null) {
@@ -158,7 +168,6 @@ class MainActivity : AppCompatActivity() {
         )
         // Toast popup
         //CHANGE THIS AFTER DEBUGGING
-        Thread.sleep(5000)
         Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
         Thread.sleep(5000)
     }
