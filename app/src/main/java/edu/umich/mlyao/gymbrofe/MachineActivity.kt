@@ -1,5 +1,6 @@
 package edu.umich.mlyao.gymbrofe
 
+import android.net.Uri
 import android.util.Log
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -19,7 +20,7 @@ object MachineActivity {
 
 
     fun getMachine(label: String?) : Machine {
-        machine = Machine("No machine found", "Could not recognize machine. Please retry with another picture.", null)
+        machine = Machine("No machine found", "Could not recognize machine. Please retry with another picture.", "https://34.73.169.40/media/1678933866.9599228.gif")
         val requestBody = label?.toRequestBody()
         val request = Request.Builder()
             .method("POST", requestBody)

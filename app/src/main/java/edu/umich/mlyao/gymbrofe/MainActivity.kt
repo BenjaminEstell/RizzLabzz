@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +26,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.umich.mlyao.gymbrofe.databinding.ActivityMainBinding
 import edu.umich.mlyao.gymbrofe.databinding.MachineCardBinding
@@ -167,7 +169,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
         // Toast popup
-        //CHANGE THIS AFTER DEBUGGING
+        Thread.sleep(5000)
         Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
         Thread.sleep(5000)
     }
@@ -375,9 +377,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private suspend fun idMachine(label: String): Machine {
-//        var model = Machine("squat rack")
-//        var controller= MachineViewAdapter(view, model)
-
         return MachineActivity.getMachine(label)
     }
     private suspend fun processImage(output_uri: Uri): String? {
@@ -388,6 +387,9 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread {
             binding.machineName.text = machine.name
             binding.machineInstructions.text = machine.instructions
+//            ImageView imageView = (ImageView) findViewById(R.id.machine_usage_image);
+            Glide.with(this).load(machine.gifUrl).into(binding.machineUsageImage)
+//            binding.machineUsageImage.setImageResource(machine.gifUrl)
             binding.cardView.visibility = View.VISIBLE
         }
         val view = binding.root
