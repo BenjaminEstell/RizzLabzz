@@ -49,5 +49,3 @@ object MachineActivity {
     }
 
 }
-
-

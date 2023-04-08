@@ -86,8 +86,16 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="center_horizontal"
-            android:translationY="395sp"
-            app:srcCompat="@drawable/lying_leg_curl" />
+            app:srcCompat="@drawable/lying_leg_curl"
+            android:translationY="395sp" />
+
+        <TextView
+            android:id="@+id/adaptation_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adaptation_info"
+            android:translationX="10sp"
+            android:translationY="655sp" />
 
     </androidx.cardview.widget.CardView>
 
