@@ -1,8 +1,8 @@
 package edu.umich.mlyao.gymbrofe
 
+
 import android.Manifest
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -15,12 +15,17 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.umich.mlyao.gymbrofe.databinding.ActivityMainBinding
+import edu.umich.mlyao.gymbrofe.databinding.MachineCardBinding
+import kotlinx.coroutines.*
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -29,23 +34,24 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import edu.umich.mlyao.gymbrofe.MachineActivity.getMachine
-import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewBinding: ActivityMainBinding
+    private lateinit var binding: MachineCardBinding
+    private lateinit var machine : Machine
+    private lateinit var card: BottomSheetDialog
 
     private var imageCapture: ImageCapture? = null
 
     private lateinit var cameraExecutor: ExecutorService
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -67,16 +73,15 @@ class MainActivity : AppCompatActivity() {
 
                 // Analyze photo
                 startActivity(Intent(this, MachineActivity::class.java))
-
-
-                val scope = CoroutineScope(Dispatchers.Default)
-                scope.launch {
-                    val label = uri?.let { processImage(it) }
-                    println(label)
-                    if (label != null) {
-                        idMachine(label)
-                    }
-                }
+                Log.d("PhotoPicker", "activity started")
+//                val scope = CoroutineScope(Dispatchers.Default)
+//                scope.launch {
+//                    val label = uri?.let { processImage(it) }
+//                    println(label)
+//                    if (label != null) {
+//                        idMachine(label)
+//                    }
+//                }
 
             } else {
                 Log.d("PhotoPicker", "No media selected")
@@ -88,11 +93,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
     }
 
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
+        val card = BottomSheetDialog(this)
+        binding = MachineCardBinding.inflate(layoutInflater)
 
         // Create time stamped name and MediaStore entry.
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
@@ -130,9 +138,16 @@ class MainActivity : AppCompatActivity() {
                     val scope = CoroutineScope(Dispatchers.Default)
                     scope.launch {
                         val label = output.savedUri?.let { processImage(it) }
-                        println(label)
+
                         if (label != null) {
-                            idMachine(label)
+                            machine = idMachine(label)
+                        }
+                        val view = populateCard(machine)
+                        runOnUiThread {
+                            if (view != null) {
+                                card.setContentView(view)
+                            }
+                            card.show()
                         }
                     }
                 }
@@ -143,10 +158,6 @@ class MainActivity : AppCompatActivity() {
         Thread.sleep(5000)
         Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
         Thread.sleep(5000)
-        val card = BottomSheetDialog(this)
-        val view = layoutInflater.inflate(R.layout.machine_card, null)
-        card.setContentView(view)
-        card.show()
     }
 
     fun returnToHomeScreen(view: View) {
@@ -262,6 +273,7 @@ class MainActivity : AppCompatActivity() {
 
         val stream: InputStream
         // Send request
+
         withContext(Dispatchers.IO) {
             val wr = DataOutputStream(
                 connection.outputStream)
@@ -270,7 +282,6 @@ class MainActivity : AppCompatActivity() {
             // Get Response
             stream = connection.inputStream
         }
-
 
 
         val reader = BufferedReader(InputStreamReader(stream))
@@ -309,27 +320,38 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         if (label == "test"){
             label = "No machine found"
         }
 
 
         connection.disconnect()
-
 //        Toast.makeText(baseContext, label, Toast.LENGTH_SHORT).show()
+        println(label)
         return label
     }
 
 
-    private suspend fun idMachine(label: String) {
-        println("In id machine func")
-        return getMachine(label)
+    private suspend fun idMachine(label: String): Machine {
+//        var model = Machine("squat rack")
+//        var controller= MachineViewAdapter(view, model)
+
+        return MachineActivity.getMachine(label)
     }
     private suspend fun processImage(output_uri: Uri): String? {
-        println("In process image func")
         return output_uri?.let { analyze(it) }
     }
 
+    private suspend fun populateCard(machine: Machine): View? {
+        runOnUiThread {
+            binding.machineName.text = machine.name
+            binding.machineInstructions.text = machine.instructions
+            binding.cardView.visibility = View.VISIBLE
+        }
+        val view = binding.root
+        return view
+    }
 
     private fun getRealPathFromURI(uri: Uri): String? {
         val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
