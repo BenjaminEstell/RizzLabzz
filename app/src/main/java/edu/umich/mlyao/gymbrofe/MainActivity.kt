@@ -142,30 +142,30 @@ class MainActivity : AppCompatActivity() {
                     scope.launch {
                         val label = output.savedUri?.let { processImage(it) }
 
-                        if (label != null) {
-                            machine = idMachine(label)
-                        }
 
-                        if (machine.name != null) {
-                            Log.d("Machine Name", machine.name.toString())
-                        }
+                        machine = MachineActivity.getMachine(label)
+
+//                        if (machine.name == null) {
+//                            machine = Machine("No machine found", "Could not recognize machine. Please retry with another picture.", null)
+//                        }
                         if (machine.instructions != null) {
                             Log.d("Machine Name", machine.instructions.toString())
                         }
                         if (machine.gifUrl != null) {
                             Log.d("Machine Name", machine.gifUrl.toString())
                         }
+
                         val view = populateCard(machine)
+                            print("CHANGINGE UI THREAD")
                         runOnUiThread {
                             if (view != null) {
                                 card.setContentView(view)
+                                }
+                                card.show()
                             }
-                            card.show()
                         }
                     }
-                }
-            }
-        )
+                })
         // Toast popup
         //CHANGE THIS AFTER DEBUGGING
         Thread.sleep(5000)
@@ -378,18 +378,21 @@ class MainActivity : AppCompatActivity() {
     private suspend fun idMachine(label: String): Machine {
 //        var model = Machine("squat rack")
 //        var controller= MachineViewAdapter(view, model)
-
         return MachineActivity.getMachine(label)
     }
     private suspend fun processImage(output_uri: Uri): String? {
         return output_uri?.let { analyze(it) }
     }
 
-    private suspend fun populateCard(machine: Machine): View? {
+    private fun populateCard(machine: Machine) : View?{
+
+        println("IN POPULATE CARD")
+        val instructions: List<String>? = machine.instructions?.split(".")
         runOnUiThread {
             binding.machineName.text = machine.name
-            binding.machineInstructions.text = machine.instructions
+            binding.machineInstructions.text = (instructions?.get(0) ?: "" ) + "\n" + (instructions?.get(1) ?: "") + (instructions?.get(2) ?: "")
             binding.cardView.visibility = View.VISIBLE
+
         }
         val view = binding.root
         return view
