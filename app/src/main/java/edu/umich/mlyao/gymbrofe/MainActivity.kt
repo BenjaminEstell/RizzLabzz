@@ -2,6 +2,7 @@ package edu.umich.mlyao.gymbrofe
 
 
 import android.Manifest
+import android.R
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,6 +15,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +39,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.bumptech.glide.Glide
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
+
+@GlideModule
+class AppGlideModule : AppGlideModule()
 
 
 class MainActivity : AppCompatActivity() {
@@ -388,10 +396,27 @@ class MainActivity : AppCompatActivity() {
 
         println("IN POPULATE CARD")
         val instructions: List<String>? = machine.instructions?.split(".")
+        var steps = ""
+        if (instructions != null) {
+            for(instruction in instructions){
+                steps += instruction + "\n \n"
+            }
+        }
+
+//        println("MUSCLES TARGETED URL")
+//        println(machine.musclesTargetedUrl)
+        val gif = machine.gifUrl
+        val gifImageView: ImageView = binding.machineUsageImage
         runOnUiThread {
+            Glide.with(this).asGif().load(gif).into(gifImageView)
+            if(machine.musclesTargetedUrl != null) {
+            binding.musclesTargetedImage.visibility = View.VISIBLE
+            Glide.with(this).load(machine.musclesTargetedUrl).into(binding.musclesTargetedImage)
+            }
             binding.machineName.text = machine.name
-            binding.machineInstructions.text = (instructions?.get(0) ?: "" ) + "\n" + (instructions?.get(1) ?: "") + (instructions?.get(2) ?: "")
+            binding.machineInstructions.text = steps
             binding.cardView.visibility = View.VISIBLE
+            binding.musclesTargeted.text = machine.musclesTargeted
 
         }
         val view = binding.root

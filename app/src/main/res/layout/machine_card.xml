@@ -68,7 +68,7 @@
             android:gravity="center_horizontal"
             android:text="@string/machine_name"
             android:textColor="#000000"
-            android:textSize="28sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:translationY="95sp" />
 
@@ -81,13 +81,44 @@
             android:textSize="16sp"
             android:translationY="150sp" />
 
+
         <ImageView
             android:id="@+id/machine_usage_image"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:translationY="395sp"
-            app:srcCompat="@drawable/lying_leg_curl" />
+            android:layout_width="130dp"
+            android:layout_height="125dp"
+            android:translationX="250sp"
+            android:translationY="20sp"
+            app:srcCompat="@drawable/machine" />
+
+        <TextView
+            android:id="@+id/muscles_targeted_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Muscles Targeted"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:translationX="1sp"
+            android:translationY="445sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/muscles_targeted"
+            android:layout_width="225dp"
+            android:layout_height="145dp"
+            android:text="@string/machine_instructions"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:translationX="1sp"
+            android:translationY="495sp" />
+
+        <ImageView
+            android:id="@+id/muscles_targeted_image"
+            android:visibility="invisible"
+            android:layout_width="130dp"
+            android:layout_height="125dp"
+            android:translationX="250sp"
+            android:translationY="470sp"
+            app:srcCompat="@drawable/machine" />
 
         <TextView
             android:id="@+id/adaptation_info"

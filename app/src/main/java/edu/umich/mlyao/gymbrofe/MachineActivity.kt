@@ -54,6 +54,8 @@ object MachineActivity {
             machine_url = machineData[2].toString()
             muscles_targeted = machineData[3].toString()
             muscles_targeted_img = machineData[4].toString()
+            println("MUSCLES TARGETED IMAGE")
+            println(muscles_targeted_img)
             machine = Machine(
                 machine_name,
                 machine_instructions,
