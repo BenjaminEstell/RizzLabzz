@@ -59,7 +59,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        var uri_x: Uri? = null
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
@@ -80,9 +79,30 @@ class MainActivity : AppCompatActivity() {
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             // Callback is invoked after the user selects a media item or closes the
             // photo picker.
+            val card = BottomSheetDialog(this)
+            binding = MachineCardBinding.inflate(layoutInflater)
             if (uri != null) {
                 Log.d("PhotoPicker", "Selected URI: $uri")
-                uri_x = uri
+                Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
+                val scope = CoroutineScope(Dispatchers.Default)
+                scope.launch {
+                    val label = uri?.let { processImage(it) }
+                    machine = MachineActivity.getMachine(label)
+                    if (machine.instructions != null) {
+                        Log.d("Machine Name", machine.instructions.toString())
+                    }
+                    if (machine.gifUrl != null) {
+                        Log.d("Machine Name", machine.gifUrl.toString())
+                    }
+                    val view = populateCard(machine)
+                    print("CHANGINGE UI THREAD")
+                    runOnUiThread {
+                        if (view != null) {
+                            card.setContentView(view)
+                        }
+                        card.show()
+                    }
+                }
 
             } else {
                 Log.d("PhotoPicker", "No media selected")
@@ -91,30 +111,6 @@ class MainActivity : AppCompatActivity() {
         viewBinding.imageGalleryButton.setOnClickListener {
             // Launch the photo picker and allow the user to choose only images.
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        }
-        if (uri_x != null) {
-            Log.d("PhotoPicker", "Activity started")
-            startActivity(Intent(this, MachineActivity::class.java))
-            Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
-            val scope = CoroutineScope(Dispatchers.Default)
-            scope.launch {
-                val label = uri_x?.let { processImage(it) }
-                machine = MachineActivity.getMachine(label)
-                if (machine.instructions != null) {
-                    Log.d("Machine Name", machine.instructions.toString())
-                }
-                if (machine.gifUrl != null) {
-                    Log.d("Machine Name", machine.gifUrl.toString())
-                }
-                val view = populateCard(machine)
-                print("CHANGINGE UI THREAD")
-                runOnUiThread {
-                    if (view != null) {
-                        card.setContentView(view)
-                    }
-                    card.show()
-                }
-            }
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
