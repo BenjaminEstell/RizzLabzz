@@ -42,6 +42,7 @@
             android:scrollbars="none"
             app:layout_constraintTop_toBottomOf="@id/x_button">
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,13 +54,16 @@
 
         <Button
             android:id="@+id/x_button"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_margin="16dp"
-            android:background="@null"
+            android:layout_margin="5dp"
+            android:backgroundTint="@color/white"
+            android:color="@color/white"
+            android:onClick="returnToHomeScreen"
             android:text="@string/close_button"
-            android:textSize="24sp"
-            android:onClick="returnToHomeScreen" />
+            android:textColor="@color/black"
+            android:textSize="25sp" />
 
         <TextView
             android:id="@+id/machineName"
@@ -68,7 +72,7 @@
             android:gravity="center_horizontal"
             android:text="@string/machine_name"
             android:textColor="#000000"
-            android:textSize="24sp"
+            android:textSize="26sp"
             android:textStyle="bold"
             android:translationY="95sp" />
 

@@ -176,7 +176,6 @@ class MainActivity : AppCompatActivity() {
                 })
         // Toast popup
         //CHANGE THIS AFTER DEBUGGING
-        Thread.sleep(5000)
         Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
         Thread.sleep(5000)
     }
