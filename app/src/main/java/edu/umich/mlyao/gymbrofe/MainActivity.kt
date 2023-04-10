@@ -282,7 +282,7 @@ class MainActivity : AppCompatActivity() {
         // Construct the URL
         val jpgName = filePath?.split("/")?.last()
         val uploadURL =
-            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName&confidence=1"
+            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName&confidence=45"
 
 
         // Http Request
@@ -338,46 +338,49 @@ class MainActivity : AppCompatActivity() {
         }
         reader.close()
         //println(parts.size/6)
-        var largestBox = 0.0
-        var x = 0.0
-        var y = 0.0
-        var width = 0.0
-        var height = 0.0
-        for (i in 1..parts.size/6){
-            //println(parts[3+6+6*(i-1)])
-            var box = parts[3+3+6*(i-1)].toDouble()*parts[3+4+6*(i-1)].toDouble()
-            //println(box)
+        if(parts.size > 4){
+            var largestBox = 0.0
+            var x = 0.0
+            var y = 0.0
+            var width = 0.0
+            var height = 0.0
+            for (i in 1..parts.size/6){
+                //println(parts[3+6+6*(i-1)])
+                var box = parts[3+3+6*(i-1)].toDouble()*parts[3+4+6*(i-1)].toDouble()
+                //println(box)
 
-            if(box > largestBox){
-                largestBox = box
-                label = parts[3+6+6*(i-1)]
-                x = parts[3+1+6*(i-1)].toDouble()
-                y = parts[3+2+6*(i-1)].toDouble()
-                width = parts[3+3+6*(i-1)].toDouble()
-                height = parts[3+4+6*(i-1)].toDouble()
+                if(box > largestBox){
+                    largestBox = box
+                    label = parts[3+6+6*(i-1)]
+                    x = parts[3+1+6*(i-1)].toDouble()
+                    y = parts[3+2+6*(i-1)].toDouble()
+                    width = parts[3+3+6*(i-1)].toDouble()
+                    height = parts[3+4+6*(i-1)].toDouble()
+                }
             }
-        }
-        val realx = x - width/2
-        val realy = y - height/2
-        println(realx)
-        println(realy)
-        println(width)
-        println(height)
+            val realx = x - width/2
+            val realy = y - height/2
+            println(realx)
+            println(realy)
+            println(width)
+            println(height)
 
-        val decodedString = Base64.getDecoder().decode(encodedFile)
-        var bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        bitmap = rotateBitmap(bitmap, 90f)
-        println(bitmap.width)
-        println(bitmap.height)
-        // Crop the subimage based on the given x, y, width, and height
-        val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
-        //val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
-        val outputStream = ByteArrayOutputStream()
-        subimage.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-        val byteArray = outputStream.toByteArray()
-        val encodedFilecrop = String(Base64.getEncoder().encode(byteArray), StandardCharsets.US_ASCII)
-        println(encodedFile) //original base64 string
-        println(encodedFilecrop) //cropped base64 string
+            val decodedString = Base64.getDecoder().decode(encodedFile)
+            var bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+            bitmap = rotateBitmap(bitmap, 90f)
+            println(bitmap.width)
+            println(bitmap.height)
+            // Crop the subimage based on the given x, y, width, and height
+            val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
+            //val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
+            val outputStream = ByteArrayOutputStream()
+            subimage.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            val byteArray = outputStream.toByteArray()
+            val encodedFilecrop = String(Base64.getEncoder().encode(byteArray), StandardCharsets.US_ASCII)
+            println(encodedFile) //original base64 string
+            println(encodedFilecrop) //cropped base64 string
+
+        }
 
 
         if (label == "test"){
@@ -421,6 +424,10 @@ class MainActivity : AppCompatActivity() {
             if(machine.musclesTargetedUrl != null) {
             binding.musclesTargetedImage.visibility = View.VISIBLE
             Glide.with(this).load(machine.musclesTargetedUrl).into(binding.musclesTargetedImage)
+            }
+
+            if(machine.name != "No Machine Found") {
+                binding.musclesTargetedHeader.visibility = View.VISIBLE
             }
             binding.machineName.text = machine.name
             binding.machineInstructions.text = steps

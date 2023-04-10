@@ -24,7 +24,7 @@ object MachineActivity {
     fun getMachine(label: String?): Machine {
         println("IN GET MACHINE")
         machine = Machine(
-            "No machine found",
+            "No Machine Found",
             "Could not recognize machine. Please retry with another picture.",
             null
         )
@@ -45,24 +45,27 @@ object MachineActivity {
                 JSONArray()
             }
             val machineData = machineReceived as JSONArray
-            machine_label = machineData[0].toString()
-            val words: List<String> = machine_label.split("-")
-            println("WORDSSSS")
-            println(words)
-            machine_name = words[0].capitalize() + " " + words[1].capitalize()
-            machine_instructions = machineData[1].toString()
-            machine_url = machineData[2].toString()
-            muscles_targeted = machineData[3].toString()
-            muscles_targeted_img = machineData[4].toString()
-            println("MUSCLES TARGETED IMAGE")
-            println(muscles_targeted_img)
-            machine = Machine(
-                machine_name,
-                machine_instructions,
-                machine_url,
-                muscles_targeted,
-                muscles_targeted_img
-            )
+            println(machineData)
+            if(machineData.length() != 0) {
+                machine_label = machineData[0].toString()
+                val words: List<String> = machine_label.split("-")
+                println("WORDSSSS")
+                println(words)
+                machine_name = words[0].capitalize() + " " + words[1].capitalize()
+                machine_instructions = machineData[1].toString()
+                machine_url = machineData[2].toString()
+                muscles_targeted = machineData[3].toString()
+                muscles_targeted_img = machineData[4].toString()
+                println("MUSCLES TARGETED IMAGE")
+                println(muscles_targeted_img)
+                machine = Machine(
+                    machine_name,
+                    machine_instructions,
+                    machine_url,
+                    muscles_targeted,
+                    muscles_targeted_img
+                )
+            }
             println(machine)
         }
 
