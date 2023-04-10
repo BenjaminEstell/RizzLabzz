@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        var uri_x: Uri? = null
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
@@ -81,18 +82,7 @@ class MainActivity : AppCompatActivity() {
             // photo picker.
             if (uri != null) {
                 Log.d("PhotoPicker", "Selected URI: $uri")
-
-                // Analyze photo
-                startActivity(Intent(this, MachineActivity::class.java))
-                Log.d("PhotoPicker", "activity started")
-//                val scope = CoroutineScope(Dispatchers.Default)
-//                scope.launch {
-//                    val label = uri?.let { processImage(it) }
-//                    println(label)
-//                    if (label != null) {
-//                        idMachine(label)
-//                    }
-//                }
+                uri_x = uri
 
             } else {
                 Log.d("PhotoPicker", "No media selected")
@@ -101,6 +91,30 @@ class MainActivity : AppCompatActivity() {
         viewBinding.imageGalleryButton.setOnClickListener {
             // Launch the photo picker and allow the user to choose only images.
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+        if (uri_x != null) {
+            Log.d("PhotoPicker", "Activity started")
+            startActivity(Intent(this, MachineActivity::class.java))
+            Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
+            val scope = CoroutineScope(Dispatchers.Default)
+            scope.launch {
+                val label = uri_x?.let { processImage(it) }
+                machine = MachineActivity.getMachine(label)
+                if (machine.instructions != null) {
+                    Log.d("Machine Name", machine.instructions.toString())
+                }
+                if (machine.gifUrl != null) {
+                    Log.d("Machine Name", machine.gifUrl.toString())
+                }
+                val view = populateCard(machine)
+                print("CHANGINGE UI THREAD")
+                runOnUiThread {
+                    if (view != null) {
+                        card.setContentView(view)
+                    }
+                    card.show()
+                }
+            }
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
