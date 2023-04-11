@@ -7,6 +7,7 @@ from django.core.files.storage import FileSystemStorage
 import json
 import os
 import time
+from app import ocr
 
 # Create your views here.
 @csrf_exempt
@@ -76,13 +77,32 @@ def getmachine(request, label):
                 return HttpResponse(status=404)
         if label == "none" or label == "":
                 return HttpResponse(status=505)
-        manufacturer = ""
+        manufacturer = "generic"
+        texts = []
+        texts_resp = []
         if request.FILES.get("image"):
-                image = request.FILES['image']
+                image = request.FILES['image'].read()
                 # send image to text detection network
-                # get text back from text detection network
-                # send text to text filtering function
+                texts = ocr.detect_text(image)
+                for text in texts:
+                        texts_resp.append(text.description.lower())
+                # texts_resp is a list of strings found in the image
+                # determine manufacturer from this list of strings
                 # get manufacturer back from function
+                brand_list = ["titan", "cybex", "scybex", "life", "hammer", "matrix", "titanfitness", "lifefitness", "hammerstrength"]
+                brands = set(brand_list)
+                for word in texts_resp:
+                        if word in brands:
+                                manufacturer = word
+                                break
+                if manufacturer == "life":
+                        manufacturer = "lifefitness"
+                elif manufacturer == "titan":
+                        manufacturer = "titanfitness"
+                elif manufacturer == "hammer":
+                        manufacturer = "hammerstrength"
+                elif manufacturer == "scybex":
+                        manufacturer = "cybex"
         cursor = connection.cursor()
         if manufacturer == "titanfitness":
        	        cursor.execute('SELECT name, instructions, machineurl, muscles, muscleurl FROM titanfitness WHERE name=%s', (label,))
@@ -99,4 +119,4 @@ def getmachine(request, label):
         data = cursor.fetchone()
         response = {}
         response['machine-info'] = data
-        return JsonResponse(response)
+        return JsonResponse(response, safe=False)

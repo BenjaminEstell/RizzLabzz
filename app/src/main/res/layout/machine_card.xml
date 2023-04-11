@@ -20,6 +20,7 @@
         android:id="@+id/topView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/cardView"/>
 
@@ -27,12 +28,15 @@
         android:id="@+id/cardView"
         android:layout_width="411dp"
         android:layout_height="731dp"
+        android:background="@color/white"
         android:minHeight="200dp"
+        app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topView">
 
@@ -53,41 +57,86 @@
 
         <Button
             android:id="@+id/x_button"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_margin="16dp"
-            android:background="@null"
+            android:layout_margin="5dp"
+            android:backgroundTint="@color/white"
+            android:color="@color/white"
+            android:onClick="returnToHomeScreen"
             android:text="@string/close_button"
-            android:textSize="24sp"
-            android:onClick="returnToHomeScreen" />
+            android:textColor="@color/black"
+            android:textSize="25sp" />
 
         <TextView
-            android:id="@+id/machine_name"
+            android:id="@+id/machineName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/machine_name"
             android:textColor="#000000"
-            android:textSize="28sp"
+            android:textSize="23sp"
             android:textStyle="bold"
-            android:translationY="95sp" />
+            android:translationX="65sp"
+            android:translationY="20sp" />
 
         <TextView
             android:id="@+id/machine_instructions"
+            android:layout_width="357dp"
+            android:layout_height="245dp"
+            android:text="@string/machine_instructions"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:translationY="120sp" />
+
+
+        <ImageView
+            android:id="@+id/machine_usage_image"
+            android:layout_width="99dp"
+            android:layout_height="76dp"
+            android:translationX="275sp"
+            android:translationY="20sp"
+            app:srcCompat="@drawable/machine" />
+
+        <TextView
+            android:id="@+id/muscles_targeted_header"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Muscles Targeted"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:translationX="1sp"
+            android:translationY="390sp" />
+
+        <TextView
+            android:id="@+id/muscles_targeted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/machine_instructions"
             android:textColor="#000000"
-            android:textSize="16sp"
-            android:translationY="150sp" />
+            android:textSize="14sp"
+            android:translationX="1sp"
+            android:translationY="475sp" />
 
         <ImageView
-            android:id="@+id/machine_usage_image"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:translationY="395sp"
-            app:srcCompat="@drawable/lying_leg_curl" />
+            android:id="@+id/muscles_targeted_image"
+            android:layout_width="130dp"
+            android:layout_height="115dp"
+            android:translationX="250sp"
+            android:translationY="360sp"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/machine" />
+
+        <TextView
+            android:id="@+id/adaptation_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="@string/adaptation_info"
+            android:translationX="10sp"
+            android:translationY="655sp" />
 
     </androidx.cardview.widget.CardView>
 
