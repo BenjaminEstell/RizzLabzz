@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         val view = populateCard(machine)
-                            print("CHANGINGE UI THREAD")
+                        print("CHANGINGE UI THREAD")
                         runOnUiThread {
                             if (view != null) {
                                 card.setContentView(view)
@@ -282,7 +282,7 @@ class MainActivity : AppCompatActivity() {
         // Construct the URL
         val jpgName = filePath?.split("/")?.last()
         val uploadURL =
-            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName&confidence=45"
+            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName&confidence=20"
 
 
         // Http Request
