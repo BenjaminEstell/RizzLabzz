@@ -2,6 +2,7 @@ package edu.umich.mlyao.gymbrofe
 
 
 import android.Manifest
+import android.R
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,6 +15,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +39,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.bumptech.glide.Glide
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
+
+@GlideModule
+class AppGlideModule : AppGlideModule()
 
 
 class MainActivity : AppCompatActivity() {
@@ -71,20 +79,30 @@ class MainActivity : AppCompatActivity() {
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             // Callback is invoked after the user selects a media item or closes the
             // photo picker.
+            val card = BottomSheetDialog(this)
+            binding = MachineCardBinding.inflate(layoutInflater)
             if (uri != null) {
                 Log.d("PhotoPicker", "Selected URI: $uri")
-
-                // Analyze photo
-                startActivity(Intent(this, MachineActivity::class.java))
-                Log.d("PhotoPicker", "activity started")
-//                val scope = CoroutineScope(Dispatchers.Default)
-//                scope.launch {
-//                    val label = uri?.let { processImage(it) }
-//                    println(label)
-//                    if (label != null) {
-//                        idMachine(label)
-//                    }
-//                }
+                Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
+                val scope = CoroutineScope(Dispatchers.Default)
+                scope.launch {
+                    val label = uri?.let { processImage(it) }
+                    machine = MachineActivity.getMachine(label)
+                    if (machine.instructions != null) {
+                        Log.d("Machine Name", machine.instructions.toString())
+                    }
+                    if (machine.gifUrl != null) {
+                        Log.d("Machine Name", machine.gifUrl.toString())
+                    }
+                    val view = populateCard(machine)
+                    print("CHANGINGE UI THREAD")
+                    runOnUiThread {
+                        if (view != null) {
+                            card.setContentView(view)
+                        }
+                        card.show()
+                    }
+                }
 
             } else {
                 Log.d("PhotoPicker", "No media selected")
@@ -142,23 +160,32 @@ class MainActivity : AppCompatActivity() {
                     scope.launch {
                         val label = output.savedUri?.let { processImage(it) }
 
-                        if (label != null) {
-                            machine = idMachine(label)
+
+                        machine = MachineActivity.getMachine(label)
+
+//                        if (machine.name == null) {
+//                            machine = Machine("No machine found", "Could not recognize machine. Please retry with another picture.", null)
+//                        }
+                        if (machine.instructions != null) {
+                            Log.d("Machine Name", machine.instructions.toString())
                         }
+                        if (machine.gifUrl != null) {
+                            Log.d("Machine Name", machine.gifUrl.toString())
+                        }
+
                         val view = populateCard(machine)
+                        print("CHANGINGE UI THREAD")
                         runOnUiThread {
                             if (view != null) {
                                 card.setContentView(view)
+                                }
+                                card.show()
                             }
-                            card.show()
                         }
                     }
-                }
-            }
-        )
+                })
         // Toast popup
         //CHANGE THIS AFTER DEBUGGING
-        Thread.sleep(5000)
         Toast.makeText(this, "Analyzing image...", Toast.LENGTH_LONG).show()
         Thread.sleep(5000)
     }
@@ -255,7 +282,7 @@ class MainActivity : AppCompatActivity() {
         // Construct the URL
         val jpgName = filePath?.split("/")?.last()
         val uploadURL =
-            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName&confidence=1"
+            "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey&name=$jpgName&confidence=20"
 
 
         // Http Request
@@ -311,46 +338,49 @@ class MainActivity : AppCompatActivity() {
         }
         reader.close()
         //println(parts.size/6)
-        var largestBox = 0.0
-        var x = 0.0
-        var y = 0.0
-        var width = 0.0
-        var height = 0.0
-        for (i in 1..parts.size/6){
-            //println(parts[3+6+6*(i-1)])
-            var box = parts[3+3+6*(i-1)].toDouble()*parts[3+4+6*(i-1)].toDouble()
-            //println(box)
+        if(parts.size > 4){
+            var largestBox = 0.0
+            var x = 0.0
+            var y = 0.0
+            var width = 0.0
+            var height = 0.0
+            for (i in 1..parts.size/6){
+                //println(parts[3+6+6*(i-1)])
+                var box = parts[3+3+6*(i-1)].toDouble()*parts[3+4+6*(i-1)].toDouble()
+                //println(box)
 
-            if(box > largestBox){
-                largestBox = box
-                label = parts[3+6+6*(i-1)]
-                x = parts[3+1+6*(i-1)].toDouble()
-                y = parts[3+2+6*(i-1)].toDouble()
-                width = parts[3+3+6*(i-1)].toDouble()
-                height = parts[3+4+6*(i-1)].toDouble()
+                if(box > largestBox){
+                    largestBox = box
+                    label = parts[3+6+6*(i-1)]
+                    x = parts[3+1+6*(i-1)].toDouble()
+                    y = parts[3+2+6*(i-1)].toDouble()
+                    width = parts[3+3+6*(i-1)].toDouble()
+                    height = parts[3+4+6*(i-1)].toDouble()
+                }
             }
-        }
-        val realx = x - width/2
-        val realy = y - height/2
-        println(realx)
-        println(realy)
-        println(width)
-        println(height)
+            val realx = x - width/2
+            val realy = y - height/2
+            println(realx)
+            println(realy)
+            println(width)
+            println(height)
 
-        val decodedString = Base64.getDecoder().decode(encodedFile)
-        var bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        bitmap = rotateBitmap(bitmap, 90f)
-        println(bitmap.width)
-        println(bitmap.height)
-        // Crop the subimage based on the given x, y, width, and height
-        val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
-        //val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
-        val outputStream = ByteArrayOutputStream()
-        subimage.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-        val byteArray = outputStream.toByteArray()
-        val encodedFilecrop = String(Base64.getEncoder().encode(byteArray), StandardCharsets.US_ASCII)
-        println(encodedFile) //original base64 string
-        println(encodedFilecrop) //cropped base64 string
+            val decodedString = Base64.getDecoder().decode(encodedFile)
+            var bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+            bitmap = rotateBitmap(bitmap, 90f)
+            println(bitmap.width)
+            println(bitmap.height)
+            // Crop the subimage based on the given x, y, width, and height
+            val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
+            //val subimage = Bitmap.createBitmap(bitmap, realx.toInt(), realy.toInt(), width.toInt(), height.toInt())
+            val outputStream = ByteArrayOutputStream()
+            subimage.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            val byteArray = outputStream.toByteArray()
+            val encodedFilecrop = String(Base64.getEncoder().encode(byteArray), StandardCharsets.US_ASCII)
+            println(encodedFile) //original base64 string
+            println(encodedFilecrop) //cropped base64 string
+
+        }
 
 
         if (label == "test"){
@@ -368,18 +398,42 @@ class MainActivity : AppCompatActivity() {
     private suspend fun idMachine(label: String): Machine {
 //        var model = Machine("squat rack")
 //        var controller= MachineViewAdapter(view, model)
-
         return MachineActivity.getMachine(label)
     }
     private suspend fun processImage(output_uri: Uri): String? {
         return output_uri?.let { analyze(it) }
     }
 
-    private suspend fun populateCard(machine: Machine): View? {
+    private fun populateCard(machine: Machine) : View?{
+
+        println("IN POPULATE CARD")
+        val instructions: List<String>? = machine.instructions?.split(".")
+        var steps = ""
+        if (instructions != null) {
+            for(instruction in instructions){
+                steps += instruction + "\n \n"
+            }
+        }
+
+//        println("MUSCLES TARGETED URL")
+//        println(machine.musclesTargetedUrl)
+        val gif = machine.gifUrl
+        val gifImageView: ImageView = binding.machineUsageImage
         runOnUiThread {
+            Glide.with(this).asGif().load(gif).into(gifImageView)
+            if(machine.musclesTargetedUrl != null) {
+            binding.musclesTargetedImage.visibility = View.VISIBLE
+            Glide.with(this).load(machine.musclesTargetedUrl).into(binding.musclesTargetedImage)
+            }
+
+            if(machine.name != "No Machine Found") {
+                binding.musclesTargetedHeader.visibility = View.VISIBLE
+            }
             binding.machineName.text = machine.name
-            binding.machineInstructions.text = machine.instructions
+            binding.machineInstructions.text = steps
             binding.cardView.visibility = View.VISIBLE
+            binding.musclesTargeted.text = machine.musclesTargeted
+
         }
         val view = binding.root
         return view

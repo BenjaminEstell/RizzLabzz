@@ -3,7 +3,7 @@ package edu.umich.mlyao.gymbrofe
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class Machine(var name: String? = null, var instructions: String? = null, gifUrl: String? = null) {
+class Machine(var name: String? = null, var instructions: String? = null, gifUrl: String? = null, var musclesTargeted: String? = null, var musclesTargetedUrl: String? = null) {
     var gifUrl: String? by MachinePropertyDelegate(gifUrl)
 }
 
