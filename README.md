@@ -1,2 +1,2 @@
 # RizzLabzz
-## Server IP: 34.73.169.40
+## Server IP: 34.23.129.33
