@@ -10,7 +10,7 @@ import java.io.IOException
 
 
 object MachineActivity {
-    private const val serverUrl = "https://34.73.169.40/"
+    private const val serverUrl = "https://34.23.129.33/"
     private val client = OkHttpClient()
     private var machine_label = ""
     private var machine_name = ""
