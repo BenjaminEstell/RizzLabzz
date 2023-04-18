@@ -2,8 +2,8 @@
 
 | Video  |  Wiki |  Trello  |
 |:-----:|:-----:|:--------:|
-|[<img src="https://eecs441.eecs.umich.edu/img/admin/video.png">] [video_page]|
-[<img src="https://eecs441.eecs.umich.edu/img/admin/wiki.png">] [wiki_page]|
+|[<img src="https://eecs441.eecs.umich.edu/img/admin/video.png">][video_page]|
+[<img src="https://eecs441.eecs.umich.edu/img/admin/wiki.png">][wiki_page]|
 [<img src="https://eecs441.eecs.umich.edu/img/admin/trello.png">][agile_page]|
 
 ![Final Presentation](https://user-images.githubusercontent.com/122689291/232874718-12cda780-d9e1-4ea3-b889-8e4db229e837.jpg) 
