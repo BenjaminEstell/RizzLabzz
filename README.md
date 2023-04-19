@@ -9,6 +9,6 @@
 ![Final Presentation (1)](https://user-images.githubusercontent.com/122689291/232877174-a106a778-869b-4b7d-ae8e-33a95917d43d.jpg)
 
 
-[video_page]: https://youtu.be/7YI7IGasDDo
+[video_page]: https://youtu.be/XmgdOj-_7KQ
 [wiki_page]: https://github.com/BenjaminEstell/RizzLabzz/wiki 
 [agile_page]: https://trello.com/b/IaAGlfcd/rizzlabzz
